@@ -1,22 +1,28 @@
 // import "styles.css";
 
 const menuLinks = [
-    {text: 'about', href: '/about'},
-    {text: 'catalog', href: '#', subLinks: [
-      {text: 'all', href: '/catalog/all'},
-      {text: 'top selling', href: '/catalog/top'},
-      {text: 'search', href: '/catalog/search'},
-    ]},
-    {text: 'orders', href: '#' , subLinks: [
-      {text: 'new', href: '/orders/new'},
-      {text: 'pending', href: '/orders/pending'},
-      {text: 'history', href: '/orders/history'},
-    ]},
-    {text: 'account', href: '#', subLinks: [
-      {text: 'profile', href: '/account/profile'},
-      {text: 'sign out', href: '/account/signout'},
-    ]},
-  ];
+    { text: 'about', href: '/about' },
+    {
+        text: 'catalog', href: '#', subLinks: [
+            { text: 'all', href: '/catalog/all' },
+            { text: 'top selling', href: '/catalog/top' },
+            { text: 'search', href: '/catalog/search' },
+        ]
+    },
+    {
+        text: 'orders', href: '#', subLinks: [
+            { text: 'new', href: '/orders/new' },
+            { text: 'pending', href: '/orders/pending' },
+            { text: 'history', href: '/orders/history' },
+        ]
+    },
+    {
+        text: 'account', href: '#', subLinks: [
+            { text: 'profile', href: '/account/profile' },
+            { text: 'sign out', href: '/account/signout' },
+        ]
+    },
+];
 
 // Part 1
 const mainEl = document.querySelector("main");
@@ -36,10 +42,10 @@ topMenuEl.classList.add("flex-around");
 
 // Part 3
 menuLinks.forEach((link) => {
-  const a = document.createElement("a");
-  a.setAttribute("href", link.href);
-  a.textContent = link.text;
-  topMenuEl.appendChild(a);
+    const a = document.createElement("a");
+    a.setAttribute("href", link.href);
+    a.textContent = link.text;
+    topMenuEl.appendChild(a);
 });
 
 // Adding Interactivity
@@ -55,28 +61,66 @@ subMenuEl.classList.add("flex-around");
 subMenuEl.style.position = "absolute";
 subMenuEl.style.top = "0";
 
-// Part 4: Adding Menu Interaction
+// Part 4 & 5:
+let oldEventTarget = "";
 
 const topMenuLinks = topMenuEl.querySelectorAll("a");
+
 topMenuEl.addEventListener("click", (event) => {
     event.preventDefault();
-    if(event.target.localName !== 'a') {
+    if (event.target.localName !== 'a') {
         return;
     }
-    
     topMenuLinks.forEach((element) => {
-            if(element !== event.target) {
-                element.classList.remove("active");  
-            }
-            
+        if (element !== event.target) {
+            element.classList.remove("active");
+        }
     })
 
-    if(event.target.classList.contains("active")) {
-        
+    for (i = 0; i < menuLinks.length; i++) {
+        if (oldEventTarget === event.target) {
+            subMenuEl.style.top = "0%";
+            oldEventTarget = "";
+            break;
+        }
+        if (menuLinks[i].text === event.target.textContent && menuLinks[i].subLinks) {
+            subMenuEl.style.top = "100%";
+            buildSubmenu(menuLinks[i].subLinks)
+            oldEventTarget = event.target
+            break;
+        } else {
+            subMenuEl.style.setProperty("top", "0%");
+            mainEl.innerHTML = `<h1>${event.target.textContent}<h1>`
+        }
     }
-
     event.target.classList.toggle("active");
 })
+
+function buildSubmenu (subLinkArr) {
+    subMenuEl.textContent = "";
+
+    subLinkArr.forEach((link) => {
+       const aEl = document.createElement("a");
+       aEl.setAttribute("href", link.href);
+       aEl.textContent = link.text;
+       subMenuEl.appendChild(aEl);
+       
+    })
+
+}
+
+subMenuEl.addEventListener("click", (event) => {
+    event.preventDefault();
+    if (event.target.localName !== 'a') {
+        return;
+    }
+    subMenuEl.style.setProperty("top", "0%")
+    topMenuLinks.forEach((element) => {
+            element.classList.remove("active");
+    })
+    mainEl.innerHTML = `<h1>${event.target.textContent}<h1>`;
+})
+
 
 
 
